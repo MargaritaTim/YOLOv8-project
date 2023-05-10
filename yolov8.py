@@ -9,7 +9,9 @@ Original file is located at
 # **Import & Mount**
 """
 
-pip install ultralytics
+# pip install ultralytics
+import image_properties_functions as image_utils
+import functions as utils
 
 import os
 from os import listdir
@@ -24,7 +26,7 @@ import re
 
 from matplotlib import pyplot
 import cv2
-from google.colab.patches import cv2_imshow
+# from google.colab.patches import cv2_imshow
 
 import xml.etree.ElementTree as ET
 
@@ -35,8 +37,8 @@ import locale
 
 from ultralytics import YOLO
 
-from google.colab import drive
-drive.mount('/content/drive')
+# from google.colab import drive
+# drive.mount('/content/drive')
 
 torch.manual_seed(0)
 
@@ -50,7 +52,7 @@ coco dataset: https://www.kaggle.com/datasets/ultralytics/coco128?resource=downl
 
 locale.getpreferredencoding = lambda: "UTF-8"
 
-!pip install pyyaml h5py
+# !pip install pyyaml h5py
 
 # Load a model
 # model = YOLO('yolov8n.yaml')  # build a new model from YAML
@@ -67,11 +69,11 @@ locale.getpreferredencoding = lambda: "UTF-8"
 """## 3 Load trained model & example"""
 
 # source: https://docs.ultralytics.com/modes/track/#available-trackers
-model_trained = YOLO('runs/detect/train/weights/best.torchscript') # change path according to relevant one
+model_trained = YOLO('/Users/hila.katz/PycharmProjects/yolov3/YOLOv8-project/best.torchscript') # change path according to relevant one
 
-image_path = "/content/drive/MyDrive/Image processing projects/Kangaroos/00050.jpg"
+image_path = "/Users/hila.katz/Pictures/cactus.png"
 
-predict_plot_image(image)
+utils.predict_plot_image(image_path,model_trained)
 
 """# **Predict COCO128**"""
 

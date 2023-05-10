@@ -3,8 +3,9 @@
 
 aspect ration (width-higeht)
 """
-
-aspect_ratio = float(w) / h
+def aspect_ratio(w,h):
+  aspect_ratio = float(w) / h
+  return aspect_ratio
 
 """brightness
 
@@ -62,7 +63,7 @@ https://stackoverflow.com/questions/58821130/how-to-calculate-the-contrast-of-an
 """
 
 
-def contrast(image_path)
+def contrast(image_path):
   # load image as YUV (or YCbCR) and select Y (intensity)
   # or convert to grayscale, which should be the same.
   # Alternately, use L (luminance) from LAB.
@@ -148,9 +149,9 @@ def blurrinesDetection(directories, threshold):
     num_edges = cv2.countNonZero(edges)
 
     # Print the number of edges
-    return num_edges
+    return num_edges
 
-    def ppi_resolution(image_path):
+  def ppi_resolution(image_path):
       from PIL import Image
       from fractions import Fraction
 
@@ -180,5 +181,4 @@ def blurrinesDetection(directories, threshold):
       ppi = round(width_px / width_in)
 
       # return the results
-
-      return ppi
+      return ppi

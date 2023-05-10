@@ -1,39 +1,30 @@
-
+# imports
 import os
-from os import listdir
-
+import re
+import cv2
+import torch
+import locale
 import random
 import shutil
 import struct
-
 import numpy as np
+import ultralytics
 import pandas as pd
-import re
-
+from os import listdir
+from ultralytics import YOLO
 from matplotlib import pyplot
-import cv2
-from google.colab.patches import cv2_imshow
-
 import xml.etree.ElementTree as ET
-
-import torch
 import torchvision.models as models
 
-import locale
-
-from ultralytics import YOLO
-
-from google.colab import drive
-drive.mount('/content/drive')
-
-torch.manual_seed(0)
+# from google.colab import drive
+# drive.mount('/content/drive')
 
 
 # function to predict and plot image
-def predict_plot_image(image_path):
+def predict_plot_image(image_path,model_trained):
   results = model_trained(image_path)
   res_plotted = results[0].plot()
-  cv2_imshow(res_plotted)
+  cv2.imshow('image',res_plotted)
 
 
 """ Functions for prediction"""
