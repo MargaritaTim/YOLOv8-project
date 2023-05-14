@@ -20,11 +20,25 @@ import torchvision.models as models
 # drive.mount('/content/drive')
 
 
+def repo_image_path(path_from_content_root):
+    # Get the path to the root directory of your repository
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    # Construct a path relative to the root directory
+    relative_path = os.path.join(repo_root, path_from_content_root)
+    return relative_path
+    # # Use the constructed path
+    # with open(relative_path, 'r') as file:
+    #     contents = file.read()
+
+
 # function to predict and plot image
 def predict_plot_image(image_path,model_trained):
   results = model_trained(image_path)
   res_plotted = results[0].plot()
   cv2.imshow('image',res_plotted)
+  cv2.waitKey(0)
+  cv2.destroyAllWindows()
 
 
 """ Functions for prediction"""
@@ -50,7 +64,7 @@ def create_df(dataset_dir, image_type, yolo_model):
             h, w, _ = im.shape
 
             # make prediction for the image
-            results = model(photo_filename)
+            results = yolo_model(photo_filename)
 
             # save bbox, masks, probabilities
             boxes, masks, _ = return_bbox_masks_probs(results)

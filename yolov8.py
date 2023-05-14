@@ -69,23 +69,23 @@ locale.getpreferredencoding = lambda: "UTF-8"
 """## 3 Load trained model & example"""
 
 # source: https://docs.ultralytics.com/modes/track/#available-trackers
-model_trained = YOLO('/Users/hila.katz/PycharmProjects/yolov3/YOLOv8-project/best.torchscript') # change path according to relevant one
+model_trained = YOLO(utils.repo_image_path('YOLOv8-project/best.torchscript'), task='detect') # change path according to relevant one
 
-image_path = "/Users/hila.katz/Pictures/cactus.png"
+image_path = utils.repo_image_path('YOLOv8-project/Kangaroos/00050.jpg')
 
 utils.predict_plot_image(image_path,model_trained)
 
 """# **Predict COCO128**"""
 
-coco128_path = '/content/drive/MyDrive/Image processing projects/coco128/image'
+coco128_path = utils.repo_image_path('YOLOv8-project/coco128/image')
 
-coco_annos_dir = '/content/drive/MyDrive/Image processing projects/coco128/annotations'
+coco_annos_dir = utils.repo_image_path('YOLOv8-project/coco128/annotations')
 
-df_coco, coco_iou = pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
+df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
 
-#df_coco
+print(df_coco)
 
-coco_iou
+print(coco_iou)
 
 """# **Predict Mouse Dataset**"""
 
@@ -93,16 +93,15 @@ mouse_path = '/content/drive/MyDrive/Image processing projects/Mouse'
 
 mouse_annos_dir = '/content/drive/MyDrive/Image processing projects/Mouse/annotations'
 
-df_mouse, mouse_iou = pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
+df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
 
 mouse_iou
 
 """Print images with low score"""
 
 def print_image(image, data_set_name,):
-  
   path = f"/content/drive/MyDrive/Image processing projects/{data_set_name}/{image}"
-  predict_plot_image(path)
+  utils.predict_plot_image(path)
 
 # finish function and move to functions.py
 def print_low_score_images(df_low, dataset_name):
@@ -137,7 +136,7 @@ zebra_image_path = '/content/drive/MyDrive/Image processing projects/Zebra'
 
 zebra_annos_dir = '/content/drive/MyDrive/Image processing projects/Zebra/annotations'
 
-df_zebra, zebra_iou = pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
+df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
 
 zebra_iou
 
@@ -167,7 +166,7 @@ windows_image_path = '/content/drive/MyDrive/Image processing projects/Street wi
 
 windows_annos_dir = '/content/drive/MyDrive/Image processing projects/Street windows/annotations'
 
-df_windows, windows_iou = pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml')
+df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml')
 
 #df_windows
 
@@ -184,11 +183,11 @@ for image in image_list:
 
 # try bad example
 window_example = '/content/drive/MyDrive/Image processing projects/Street windows/000003.jpg'
-predict_plot_image(window_example)
+utils.predict_plot_image(window_example)
 
 # Try good axample
 window_example2 = '/content/drive/MyDrive/Image processing projects/Street windows/000004.jpg'
-predict_plot_image(window_example2)
+utils.predict_plot_image(window_example2)
 
 """# **Predict Kangaroos Dataset**"""
 
@@ -196,7 +195,7 @@ kangaroos_image_path = '/content/drive/MyDrive/Image processing projects/Kangaro
 
 kangaroos_annos_dir = '/content/drive/MyDrive/Image processing projects/Kangaroos/annots'
 
-df_kangaroos, kangaroos_iou = pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml')
+df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml')
 
 #df_kangaroos
 
@@ -215,7 +214,7 @@ face_mask_image_path = '/content/drive/MyDrive/Image processing projects/Face ma
 
 face_mask_annos_dir = '/content/drive/MyDrive/Image processing projects/Face mask dataset/annotations'
 
-df_face_mask, face_mask_iou = pipeline('face_mask', face_mask_image_path, face_mask_annos_dir, 'jpg', model_trained, '.xml')
+df_face_mask, face_mask_iou = utils.pipeline('face_mask', face_mask_image_path, face_mask_annos_dir, 'jpg', model_trained, '.xml')
 
 face_mask_iou
 
