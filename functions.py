@@ -2,6 +2,7 @@
 import os
 import re
 import cv2
+import git
 import torch
 import locale
 import random
@@ -16,21 +17,21 @@ from matplotlib import pyplot
 import xml.etree.ElementTree as ET
 import torchvision.models as models
 
-# from google.colab import drive
-# drive.mount('/content/drive')
+def print_low_score_images(df_low, dataset_name,model_trained):
+  image_list = df_low.index.values.tolist()
+  for image in image_list:
+    print_image_by_dataset_and_name(image, dataset_name,model_trained)
 
-
-def repo_image_path(path_from_content_root):
-    # Get the path to the root directory of your repository
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-    # Construct a path relative to the root directory
-    relative_path = os.path.join(repo_root, path_from_content_root)
+def repo_image_path(path_from_repo_root):
+    repo = git.Repo('.', search_parent_directories=True)
+    repo_root = repo.working_tree_dir
+    relative_path = repo_root + path_from_repo_root
     return relative_path
-    # # Use the constructed path
-    # with open(relative_path, 'r') as file:
-    #     contents = file.read()
 
+def print_image_by_dataset_and_name(image, data_set_name,model):
+    path = f"/{data_set_name}/{image}"
+    repo_path = repo_image_path(path)
+    predict_plot_image(repo_path,model)
 
 # function to predict and plot image
 def predict_plot_image(image_path,model_trained):

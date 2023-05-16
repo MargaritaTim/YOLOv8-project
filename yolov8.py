@@ -69,17 +69,17 @@ locale.getpreferredencoding = lambda: "UTF-8"
 """## 3 Load trained model & example"""
 
 # source: https://docs.ultralytics.com/modes/track/#available-trackers
-model_trained = YOLO(utils.repo_image_path('YOLOv8-project/best.torchscript'), task='detect') # change path according to relevant one
+model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect') # change path according to relevant one
 
-image_path = utils.repo_image_path('YOLOv8-project/Kangaroos/00050.jpg')
+image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
 
 utils.predict_plot_image(image_path,model_trained)
 
 """# **Predict COCO128**"""
 
-coco128_path = utils.repo_image_path('YOLOv8-project/coco128/image')
+coco128_path = utils.repo_image_path('/coco128/image')
 
-coco_annos_dir = utils.repo_image_path('YOLOv8-project/coco128/annotations')
+coco_annos_dir = utils.repo_image_path('/coco128/annotations')
 
 df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
 
@@ -89,26 +89,15 @@ print(coco_iou)
 
 """# **Predict Mouse Dataset**"""
 
-mouse_path = '/content/drive/MyDrive/Image processing projects/Mouse'
+mouse_path = utils.repo_image_path('/Mouse')
 
-mouse_annos_dir = '/content/drive/MyDrive/Image processing projects/Mouse/annotations'
+mouse_annos_dir = utils.repo_image_path('/Mouse/annotations')
 
 df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
 
-mouse_iou
+print(mouse_iou)
 
 """Print images with low score"""
-
-def print_image(image, data_set_name,):
-  path = f"/content/drive/MyDrive/Image processing projects/{data_set_name}/{image}"
-  utils.predict_plot_image(path)
-
-# finish function and move to functions.py
-def print_low_score_images(df_low, dataset_name):
-  image_list = df_low.index.values.tolist()
-  for image in image_list:
-    print_image(image, dataset_name)
-
 
 df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
@@ -116,10 +105,8 @@ df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['av
 
 image_list = df_mouse_low_score.index.values.tolist()
 
-#print_image("035ea087488d912d.jpg", "Mouse")
-
 for image in image_list:
-  print_image(image, "Mouse")
+  utils.print_image_by_dataset_and_name(image, "Mouse", model_trained)
 
 """Print images with high score"""
 
@@ -128,17 +115,17 @@ df_mouse_high_score = df_mouse[(df_mouse["avg_score"] > 0.8)].sort_values(by=['a
 image_list = df_mouse_high_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Mouse")
+  utils.print_image_by_dataset_and_name(image, "Mouse",model_trained)
 
 """# **Predict Zebras Dataset**"""
 
-zebra_image_path = '/content/drive/MyDrive/Image processing projects/Zebra'
+zebra_image_path = utils.repo_image_path('/Zebra')
 
-zebra_annos_dir = '/content/drive/MyDrive/Image processing projects/Zebra/annotations'
+zebra_annos_dir = utils.repo_image_path('/Zebra/annotations')
 
 df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
 
-zebra_iou
+print(zebra_iou)
 
 """Print low score images"""
 
@@ -149,7 +136,7 @@ df_zebra_low_score = df_zebra[(df_zebra["avg_score"] < 0.5)].sort_values(by=['av
 image_list = df_zebra_low_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Zebra")
+  utils.print_image_by_dataset_and_name(image, "Zebra",model_trained)
 
 """Print high score images"""
 
@@ -158,19 +145,19 @@ df_zebra_low_score = df_zebra[(df_zebra["avg_score"] > 0.8)].sort_values(by=['av
 image_list = df_zebra_low_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Zebra")
+  utils.print_image_by_dataset_and_name(image, "Zebra",model_trained)
 
 """# **Predict Windows Dataset**"""
 
-windows_image_path = '/content/drive/MyDrive/Image processing projects/Street windows'
+windows_image_path = utils.repo_image_path('/Street windows')
 
-windows_annos_dir = '/content/drive/MyDrive/Image processing projects/Street windows/annotations'
+windows_annos_dir = utils.repo_image_path('/Street windows/annotations')
 
 df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml')
 
 #df_windows
 
-windows_iou
+print(windows_iou)
 
 df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
@@ -179,50 +166,50 @@ df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(b
 image_list = df_windows_low_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Street windows")
+  utils.print_image_by_dataset_and_name(image, "Street windows",model_trained)
 
 # try bad example
-window_example = '/content/drive/MyDrive/Image processing projects/Street windows/000003.jpg'
-utils.predict_plot_image(window_example)
+window_example = utils.repo_image_path('/Street windows/000003.jpg')
+utils.predict_plot_image(window_example,model_trained)
 
 # Try good axample
-window_example2 = '/content/drive/MyDrive/Image processing projects/Street windows/000004.jpg'
-utils.predict_plot_image(window_example2)
+window_example2 = utils.repo_image_path('/Street windows/000004.jpg')
+utils.predict_plot_image(window_example2,model_trained)
 
 """# **Predict Kangaroos Dataset**"""
 
-kangaroos_image_path = '/content/drive/MyDrive/Image processing projects/Kangaroos'
+kangaroos_image_path = utils.repo_image_path('/Kangaroos')
 
-kangaroos_annos_dir = '/content/drive/MyDrive/Image processing projects/Kangaroos/annots'
+kangaroos_annos_dir = utils.repo_image_path('/Kangaroos/annots')
 
 df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml')
 
 #df_kangaroos
 
-kangaroos_iou
+print(kangaroos_iou)
 
 df_kangaroos_low_score = df_kangaroos[(df_kangaroos["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
 image_list = df_kangaroos_low_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Kangaroos")
+  utils.print_image_by_dataset_and_name(image, "Kangaroos",model_trained)
 
 """# **Predict Face mask Dataset**"""
 
-face_mask_image_path = '/content/drive/MyDrive/Image processing projects/Face mask dataset'
+face_mask_image_path = utils.repo_image_path('/Face mask dataset')
 
-face_mask_annos_dir = '/content/drive/MyDrive/Image processing projects/Face mask dataset/annotations'
+face_mask_annos_dir = utils.repo_image_path('/Face mask dataset/annotations')
 
 df_face_mask, face_mask_iou = utils.pipeline('face_mask', face_mask_image_path, face_mask_annos_dir, 'jpg', model_trained, '.xml')
 
-face_mask_iou
+print(face_mask_iou)
 
 df_face_mask_low_score = df_face_mask[(df_face_mask["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
 image_list = df_face_mask_low_score.index.values.tolist()
 
 for image in image_list:
-  print_image(image, "Face mask dataset")
+  utils.print_image_by_dataset_and_name(image, "Face mask dataset",model_trained)
 
 """# **Predict B&W mask Dataset**"""
