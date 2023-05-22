@@ -1,6 +1,4 @@
-
 # ** Imports **
-
 import image_properties_functions as image_utils
 import functions as utils
 
@@ -10,10 +8,11 @@ from os import listdir
 import random
 import shutil
 import struct
+import re
+import locale
 
 import numpy as np
 import pandas as pd
-import re
 
 from matplotlib import pyplot
 import cv2
@@ -24,21 +23,14 @@ import xml.etree.ElementTree as ET
 import torch
 import torchvision.models as models
 
-import locale
-
-ultralytics
+import ultralytics
 from ultralytics import YOLO
 
 torch.manual_seed(0)
 
-"""# **YOLOv8 model**
+# **YOLOv8 model**
 
-## 1 Create YOLOv8 model
-
-source: https://docs.ultralytics.com/,
-coco dataset: https://www.kaggle.com/datasets/ultralytics/coco128?resource=download
-"""
-
+# **1 Create YOLOv8 model**
 locale.getpreferredencoding = lambda: "UTF-8"
 
 # !pip install pyyaml h5py
@@ -51,32 +43,27 @@ locale.getpreferredencoding = lambda: "UTF-8"
 # Train the model
 # model.train(data='coco128.yaml', epochs=10, imgsz=640)
 
-"""## 2 Save the trained model"""
+# **2 Save the trained model**
+# export the model
+# model.export()  
 
-# model.export()  # export the model
+# **3 Load trained model & example**
+model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 
-"""## 3 Load trained model & example"""
-
-# source: https://docs.ultralytics.com/modes/track/#available-trackers
-model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect') # change path according to relevant one
-
+# ** Example**
 image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
-
 utils.predict_plot_image(image_path,model_trained)
 
-"""# **Predict COCO128**"""
-
+# **Predict COCO128**
 coco128_path = utils.repo_image_path('/coco128/image')
-
 coco_annos_dir = utils.repo_image_path('/coco128/annotations')
 
 df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
 
 print(df_coco)
-
 print(coco_iou)
 
-"""# **Predict Mouse Dataset**"""
+# **Predict Mouse Dataset**
 
 mouse_path = utils.repo_image_path('/Mouse')
 
