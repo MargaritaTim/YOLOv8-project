@@ -54,38 +54,35 @@ model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
 utils.predict_plot_image(image_path,model_trained)
 
+# creating dict to save iou results for all datasets
+iou_dict = {}
+
 # **Predict COCO128**
 coco128_path = utils.repo_image_path('/coco128/image')
 coco_annos_dir = utils.repo_image_path('/coco128/annotations')
 
 df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
+#print(coco_iou)
 
-print(df_coco)
-print(coco_iou)
+iou_dict["coco128"] = coco_iou
 
 # **Predict Mouse Dataset**
-
 mouse_path = utils.repo_image_path('/Mouse')
-
 mouse_annos_dir = utils.repo_image_path('/Mouse/annotations')
 
 df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
+#print(mouse_iou)
 
-print(mouse_iou)
+iou_dict["mouse"] = mouse_iou
 
-"""Print images with low score"""
+#Print images with low score
+#df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
+#image_list = df_mouse_low_score.index.values.tolist()
 
-df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
+#for image in image_list:
+#  utils.print_image_by_dataset_and_name(image, "Mouse", model_trained)
 
-#df_mouse_low_score
-
-image_list = df_mouse_low_score.index.values.tolist()
-
-for image in image_list:
-  utils.print_image_by_dataset_and_name(image, "Mouse", model_trained)
-
-"""Print images with high score"""
-
+#Print images with high score
 df_mouse_high_score = df_mouse[(df_mouse["avg_score"] > 0.8)].sort_values(by=['avg_score'])
 
 image_list = df_mouse_high_score.index.values.tolist()
