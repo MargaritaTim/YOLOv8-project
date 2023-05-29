@@ -17,21 +17,12 @@ from matplotlib import pyplot
 import xml.etree.ElementTree as ET
 import torchvision.models as models
 
-def print_low_score_images(df_low, dataset_name,model_trained):
-  image_list = df_low.index.values.tolist()
-  for image in image_list:
-    print_image_by_dataset_and_name(image, dataset_name,model_trained)
-
+# change image path to current repo
 def repo_image_path(path_from_repo_root):
     repo = git.Repo('.', search_parent_directories=True)
     repo_root = repo.working_tree_dir
     relative_path = repo_root + path_from_repo_root
     return relative_path
-
-def print_image_by_dataset_and_name(image, data_set_name,model):
-    path = f"/{data_set_name}/{image}"
-    repo_path = repo_image_path(path)
-    predict_plot_image(repo_path,model)
 
 # function to predict and plot image
 def predict_plot_image(image_path,model_trained):
@@ -41,18 +32,17 @@ def predict_plot_image(image_path,model_trained):
   cv2.waitKey(0)
   cv2.destroyAllWindows()
 
+""" Functions for prediction """
 
-""" Functions for prediction"""
-
+# returns masks, boxes and class probabilities for each image
 def return_bbox_masks_probs(res_lst):
     for result in res_lst:
         boxes = result.boxes  # Boxes object for bbox outputs
         masks = result.masks  # Masks object for segmenation masks outputs
         probs = result.probs  # Class probabilities for classification outputs
-
     return boxes, masks, probs
 
-
+# create dataset with image data, predicted boxes and size
 def create_df(dataset_dir, image_type, yolo_model):
     pred_df = pd.DataFrame()
 
@@ -69,17 +59,14 @@ def create_df(dataset_dir, image_type, yolo_model):
 
             # save bbox, masks, probabilities
             boxes, masks, _ = return_bbox_masks_probs(results)
-
             list_of_boxes = boxes.xyxy.tolist()
 
             # append to dataframe
-            df = pd.DataFrame([{'name': image, 'boxes': list_of_boxes, "height": h, "width": w}])
-
+            df = pd.DataFrame([{'name': image, 'height': h, 'width': w, 'boxes': list_of_boxes, }])
             pred_df = pd.concat([pred_df, df], ignore_index=True)
-
     return pred_df
 
-
+# extract predicted boxes from annotation file
 def extract_boxes(dataset_dir):
     boxes = {}
 
@@ -101,10 +88,9 @@ def extract_boxes(dataset_dir):
                 bbox_list.append(bbox)
             file.close()
         boxes[txt_file] = bbox_list
-
     return boxes
 
-
+# extract real boxes from annotation file in xml format
 def extract_xml_boxes(dataset_dir):
     boxes = {}
 
@@ -115,32 +101,25 @@ def extract_xml_boxes(dataset_dir):
         with open(photo_filename, 'r') as file:
             tree = ET.parse(photo_filename)
             root = tree.getroot()
-
             bbox_list = []
-
             for neighbor in root.iter('bndbox'):
                 xmin = (neighbor.find('xmin').text)
                 ymin = (neighbor.find('ymin').text)
                 xmax = (neighbor.find('xmax').text)
                 ymax = (neighbor.find('ymax').text)
-
                 bbox_list.append([xmin, ymin, xmax, ymax])
-
         boxes[txt_file] = bbox_list
-
     return boxes
 
-
+# create dataframe with image name and annotations
 def create_annotations_df(annotations_dir):
     anno_dict = extract_boxes(annotations_dir)
     df_anno = pd.DataFrame({'name': anno_dict.keys(), 'annotations': anno_dict.values()})
-
     return df_anno
 
-
+# convert absolute boxes measures to relative format
 def boxes_abs_to_relative(boxes, h, w):
     relative_boxes = []
-
     for box in boxes:
         # if box:
         xmin = float(box[0]) / w
@@ -150,24 +129,20 @@ def boxes_abs_to_relative(boxes, h, w):
         relative_boxes.append([xmin, ymin, xmax, ymax])
         # else:
         #  relative_boxes.append([])
-
     return relative_boxes
 
-
-# yolo format to relative bbox format
+# convert yolo boxes measures to relative format
 def yolo_to_relative(boxes):
     relative_boxes = []
-
     for box in boxes:
         xmin = (box[0] - box[2] / 2)
         ymin = (box[1] - box[3] / 2)
         xmax = (box[0] + box[2] / 2)
         ymax = (box[1] + box[3] / 2)
         relative_boxes.append([xmin, ymin, xmax, ymax])
-
     return relative_boxes
 
-
+# calculate and return IOU per image
 def bbox_iou(box1, box2):
     # box1 and box2 are lists with 4 elements [xmin, ymin, xmax, ymax]
     # Calculate the coordinates of the intersection rectangle
@@ -188,9 +163,7 @@ def bbox_iou(box1, box2):
 
     # Calculate the IoU
     iou = intersection_area / union_area
-
     return iou
-
 
 # function to calculate IoU between two lists of bboxes
 def calculate_iou_list(pred_bboxes, ann_bboxes):
@@ -207,22 +180,20 @@ def calculate_iou_list(pred_bboxes, ann_bboxes):
 
     return iou_list
 
-
+# function to calculate the maximum IOU in case of
+# #several predictions for the same image
 def max_iou(list_of_iou):
     max_lst = []
-
     for lst in list_of_iou:
         if lst:
             max_lst.append(max(lst))
         else:
             max_lst.append(0)
-
     return max_lst
 
+""" Pipeline function """
 
-"""## 4 Pipeline function"""
-
-
+# create dataframe with all the relevant data
 def pipeline(dataset_name, dataset_path, annotation_path, image_format, model, annotation_foramt=None):
     df_images = create_df(dataset_path, image_format, model)
 
@@ -260,5 +231,15 @@ def pipeline(dataset_name, dataset_path, annotation_path, image_format, model, a
     df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
 
     total_iou = df_images['avg_score'].mean()
-
     return df_images, total_iou
+
+# functions to print images with low iou score
+def print_low_score_images(df_low, dataset_name,model_trained):
+  image_list = df_low.index.values.tolist()
+  for image in image_list:
+    print_image_by_dataset_and_name(image, dataset_name,model_trained)
+
+def print_image_by_dataset_and_name(image, data_set_name,model):
+    path = f"/{data_set_name}/{image}"
+    repo_path = repo_image_path(path)
+    predict_plot_image(repo_path,model)

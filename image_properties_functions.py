@@ -1,18 +1,20 @@
 
-"""# image properties functions
+''' image properties functions '''
 
-aspect ration (width-higeht)
-"""
+# imports
+from PIL import Image, ImageStat
+
+
+
+# aspect ratio (width-height)
 def aspect_ratio(w,h):
   aspect_ratio = float(w) / h
   return aspect_ratio
 
-"""brightness
+"""brightness"""
 
-https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
-"""
+#source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
 
-from PIL import Image, ImageStat
 
 
 def brightness(im_file):
