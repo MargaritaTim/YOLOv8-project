@@ -1,62 +1,47 @@
-
 ''' image properties functions '''
 
 # imports
+import cv2
+from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
+
 from PIL import Image, ImageStat
 
+# useful packeges
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# statistic packeges
+from scipy.ndimage import variance
+from skimage import io
+from skimage.color import rgb2gray
+from skimage.filters import laplace
+from skimage.transform import resize
 
 
-# aspect ratio (width-height)
-def aspect_ratio(w,h):
-  aspect_ratio = float(w) / h
-  return aspect_ratio
+# %matplotlib inline
+
+""" aspect ratio (width-height) """
+def return_aspect_ratio(w,h):
+  return float(w) / h
 
 """brightness"""
 
+# Convert the image to grayscale
+def convert_image_to_grayscale(image):
+  gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+  return gray_image
+
+# Calculate the mean brightness value
+def get_image_brightness(image):
+  brightness = int(round(cv2.mean(image)[0]))
+  return brightness
 #source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
-
-
-
-def brightness(im_file):
-  # Convert image to greyscale, return average pixel brightness.
-  im = Image.open(im_file).convert('L')
-  stat = ImageStat.Stat(im)
-  return stat.mean[0]
-
-
-def brightness(im_file):
-  # Convert image to greyscale, return RMS pixel brightness.
-  im = Image.open(im_file).convert('L')
-  stat = ImageStat.Stat(im)
-  return stat.rms[0]
 
 
 """perceived brightness"""
 
-
-def brightness(im_file):
-  # Average pixels, then transform to "perceived brightness".
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  r, g, b = stat.mean
-  return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-
-
-def brightness(im_file):
-  # RMS of pixels, then transform to "perceived brightness".
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  r, g, b = stat.rms
-  return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-
-
-def brightness(im_file):
-  # Calculate "perceived brightness" of pixels, then return average.
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  gs = (math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-        for r, g, b in im.getdata())
-  return sum(gs) / stat.count[0]
 
 
 """contrast
@@ -85,26 +70,7 @@ def contrast(image_path):
 https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
 """
 
-# Commented out IPython magic to ensure Python compatibility.
-# open cv packege
-import cv2
-from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
 
-# useful packeges
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# statistic packeges
-from scipy.ndimage import variance
-from skimage import io
-from skimage.color import rgb2gray
-from skimage.filters import laplace
-from skimage.transform import resize
-
-
-# %matplotlib inline
 
 def variance_of_laplacian(img2):
   # compute the Laplacian of the image and then return the focus

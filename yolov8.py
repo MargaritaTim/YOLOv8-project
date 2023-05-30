@@ -52,8 +52,8 @@ locale.getpreferredencoding = lambda: "UTF-8"
 model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 
 # ** Example**
-image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
-utils.predict_plot_image(image_path,model_trained)
+#image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
+#utils.predict_plot_image(image_path,model_trained)
 
 # create dictionary to save iou results for all datasets
 iou_dict = {}
@@ -119,7 +119,7 @@ iou_dict["zebra"] = zebra_iou
 windows_image_path = utils.repo_image_path('/Street windows')
 windows_annos_dir = utils.repo_image_path('/Street windows/annotations')
 
-df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml')
+df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml', None)
 #print(windows_iou)
 
 iou_dict["windows"] = windows_iou
@@ -144,7 +144,7 @@ iou_dict["windows"] = windows_iou
 kangaroos_image_path = utils.repo_image_path('/Kangaroos')
 kangaroos_annos_dir = utils.repo_image_path('/Kangaroos/annots')
 
-df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml')
+df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml', None)
 
 iou_dict["kangaroos"] = kangaroos_iou
 
@@ -173,21 +173,31 @@ iou_dict["kangaroos"] = kangaroos_iou
 
 """ Predict B&W Dataset """
 
-bw_zebra_image_path = utils.repo_image_path('/BW-Zebra')
+#bw_zebra_image_path = utils.repo_image_path('/BW-Zebra')
 
 # create folder for B&W dataset
-if not os.path.exists(bw_zebra_image_path):
-    os.makedirs(bw_zebra_image_path)
+#if not os.path.exists(bw_zebra_image_path):
+#    os.makedirs(bw_zebra_image_path)
 
-# convert images to greyscale
-for filename in os.listdir(zebra_image_path):
-    if filename.endswith(".jpg") or filename.endswith(".png"):
-        img_path = os.path.join(zebra_image_path, filename)
-        img = Image.open(img_path).convert('L')
-        img.save(os.path.join(zebra_image_path, filename))
+# convert images to grayscale
+#for filename in os.listdir(zebra_image_path):
+#    if filename.endswith(".jpg") or filename.endswith(".png"):
+#        img_path = os.path.join(zebra_image_path, filename)
+#        img = Image.open(img_path).convert('L')
+#        img.save(os.path.join(zebra_image_path, filename))
 
-df_bw_zebra, bw_zebra_iou = utils.pipeline('bw_zebra', bw_zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
+#df_bw_zebra, bw_zebra_iou = utils.pipeline('bw_zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained, None, "BW")
 
-iou_dict["bw_zebra"] = bw_zebra_iou
+#iou_dict["bw_zebra"] = bw_zebra_iou
 
 print(iou_dict)
+
+""" Image properties """
+
+#df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
+#df_mouse
+#return_aspect_ratio(w,h)
+#df_images['relative_boxes'] = df_images.apply(lambda row: boxes_abs_to_relative(row['boxes'], row['height'], row['width']), axis=1)
+#df_zebra
+#df_windows
+#df_kangaroos
