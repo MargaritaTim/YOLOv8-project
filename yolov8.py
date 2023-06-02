@@ -31,6 +31,13 @@ torch.manual_seed(0)
 
 ''' YOLOv8 model '''
 
+# list with datasets names
+dataset_names = ["coco128", "mouse", "zebra", "windows", "kangaroos"]
+
+# create dictionary to save iou results for all datasets
+iou_dict = {}
+
+
 ''' 1 Create YOLOv8 model '''
 locale.getpreferredencoding = lambda: "UTF-8"
 
@@ -54,9 +61,6 @@ model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 # ** Example**
 #image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
 #utils.predict_plot_image(image_path,model_trained)
-
-# create dictionary to save iou results for all datasets
-iou_dict = {}
 
 ''' Predict COCO128 Dataset '''
 
@@ -193,11 +197,13 @@ iou_dict["kangaroos"] = kangaroos_iou
 print(iou_dict)
 
 """ Image properties """
+for name in dataset_names:
 
 #df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
-#df_mouse
+
 #return_aspect_ratio(w,h)
 #df_images['relative_boxes'] = df_images.apply(lambda row: boxes_abs_to_relative(row['boxes'], row['height'], row['width']), axis=1)
+# df_mouse
 #df_zebra
 #df_windows
 #df_kangaroos

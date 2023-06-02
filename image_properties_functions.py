@@ -3,53 +3,33 @@
 # imports
 import cv2
 from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
-
 from PIL import Image, ImageStat
 
-# useful packeges
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# statistic packeges
-from scipy.ndimage import variance
-from skimage import io
-from skimage.color import rgb2gray
-from skimage.filters import laplace
-from skimage.transform import resize
-
-
-# %matplotlib inline
 
 """ aspect ratio (width-height) """
 def return_aspect_ratio(w,h):
   return float(w) / h
 
-"""brightness"""
-
 # Convert the image to grayscale
 def convert_image_to_grayscale(image):
-  gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-  return gray_image
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray_image
 
+"""brightness"""
 # Calculate the mean brightness value
 def get_image_brightness(image):
-  brightness = int(round(cv2.mean(image)[0]))
-  return brightness
-#source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
+    im = convert_image_to_grayscale(image)
+    brightness = int(round(cv2.mean(im)[0]))
+    return brightness
+
+# calculate with rms?
+
+""" perceived brightness """
 
 
-"""perceived brightness"""
 
-
-
-"""contrast
-
-https://stackoverflow.com/questions/58821130/how-to-calculate-the-contrast-of-an-image
-"""
-
-
+""" contrast """
 def contrast(image_path):
   # load image as YUV (or YCbCR) and select Y (intensity)
   # or convert to grayscale, which should be the same.
@@ -64,6 +44,12 @@ def contrast(image_path):
   # compute contrast
   contrast = (max - min) / (max + min)
   return contrast
+
+
+def get_image_contrast(image):
+    # Calculate the standard deviation of pixel intensities
+    contrast = np.std(image)
+    return contrast
 
 
 """blur
@@ -150,3 +136,5 @@ def blurrinesDetection(directories, threshold):
 
       # return the results
       return ppi
+
+  def rgb_histograms(image):
