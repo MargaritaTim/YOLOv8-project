@@ -37,7 +37,6 @@ dataset_names = ["coco128", "mouse", "zebra", "windows", "kangaroos"]
 # create dictionary to save iou results for all datasets
 iou_dict = {}
 
-
 ''' 1 Create YOLOv8 model '''
 locale.getpreferredencoding = lambda: "UTF-8"
 
@@ -80,10 +79,11 @@ df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg'
 
 iou_dict["mouse"] = mouse_iou
 
-# print images with low score
-# df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
-#mouse_low_score_lst = df_mouse_low_score.index.values.tolist()
+# images with low score
+df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
+# print images with low score
+#mouse_low_score_lst = df_mouse_low_score.index.values.tolist()
 #for image in mouse_low_score_lst:
 #  utils.print_image_by_dataset_and_name(image, "Mouse", model_trained)
 

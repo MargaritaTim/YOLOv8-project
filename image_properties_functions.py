@@ -7,14 +7,21 @@ from PIL import Image, ImageStat
 
 import numpy as np
 
-""" aspect ratio (width-height) """
-def return_aspect_ratio(w,h):
-  return float(w) / h
+# convert BGR to RGB
+def BGR2RGB(BGR_img):
+  # turning BGR pixel color to RGB
+  rgb_image = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2RGB)
+  return rgb_image
 
 # Convert the image to grayscale
 def convert_image_to_grayscale(image):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray_image
+
+
+""" aspect ratio (width-height) """
+def return_aspect_ratio(w,h):
+  return float(w) / h
 
 """brightness"""
 # Calculate the mean brightness value
@@ -30,19 +37,16 @@ def get_image_brightness(image):
 
 
 """ contrast """
-def contrast(image_path):
+def contrast(image):
   # load image as YUV (or YCbCR) and select Y (intensity)
-  # or convert to grayscale, which should be the same.
-  # Alternately, use L (luminance) from LAB.
-  img = cv2.imread(image_path)
-  Y = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)[:, :, 0]
+  Y = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)[:, :, 0]
 
   # compute min and max of Y
   min = np.min(Y)
   max = np.max(Y)
-
   # compute contrast
   contrast = (max - min) / (max + min)
+
   return contrast
 
 
@@ -65,10 +69,40 @@ def variance_of_laplacian(img2):
   return cv2.Laplacian(gray, cv2.CV_64F).var()
 
 
-def BGR2RGB(BGR_img):
-  # turning BGR pixel color to RGB
-  rgb_image = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2RGB)
-  return rgb_image
+
+""" BGR histograms """
+def bgr_histograms(image, name):
+
+    # Get BGR data from image
+    blue_channel = cv2.calcHist([img], [0], None, [256], [0, 256])
+    green_channel = cv2.calcHist([img], [1], None, [256], [0, 256])
+    red_channel = cv2.calcHist([img], [2], None, [256], [0, 256])
+
+    # Separate Histograms for each color
+    plt.subplot(3, 1, 1)
+    plt.title("Histogram of Blue Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(blue_channel, color="blue")
+
+    plt.subplot(3, 1, 2)
+    plt.title("Histogram of Green Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(green_channel, color="green")
+
+    plt.subplot(3, 1, 3)
+    plt.title("Histogram of Red Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(red_channel, color="red")
+
+    hist_name = 'rgb_histogram ' + name
+
+    plt.savefig(hist_name)
+
+
+
 
 
 def blurrinesDetection(directories, threshold):
@@ -137,4 +171,3 @@ def blurrinesDetection(directories, threshold):
       # return the results
       return ppi
 
-  def rgb_histograms(image):

@@ -51,6 +51,7 @@ def create_df(dataset_dir, image_type, yolo_model, color=None):
         if (image.endswith(image_type)):
             # load and prepare image
             photo_filename = dataset_dir + "/" + image
+            # load image in GBR format
             im = cv2.imread(photo_filename)
             h, w, _ = im.shape
 
