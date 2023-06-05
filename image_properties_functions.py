@@ -60,6 +60,19 @@ def get_image_contrast(image):
 https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
 """
 
+#define bluriness using laplacian
+def is_blurry(image_path):
+  #read the image
+  image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+  #Compute Laplacian 
+  laplacian = cv2.Laplacian(image, cv2.CV_64F)
+
+  #calculate the variance of the laplaican 
+  var = np.var(laplacian)
+
+  return var
+
 
 
 def variance_of_laplacian(img2):
@@ -67,7 +80,6 @@ def variance_of_laplacian(img2):
   # measure, which is simply the variance of the Laplacian
   gray = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
   return cv2.Laplacian(gray, cv2.CV_64F).var()
-
 
 
 """ BGR histograms """
@@ -100,8 +112,6 @@ def bgr_histograms(image, name):
     hist_name = 'rgb_histogram ' + name
 
     plt.savefig(hist_name)
-
-
 
 
 
@@ -171,3 +181,36 @@ def blurrinesDetection(directories, threshold):
       # return the results
       return ppi
 
+""" object precentage from image """
+#considering there is at least one object per image
+
+def object_percentage(image_path, object_color_lower, object_color_upper):
+
+    # Read the image
+    img = cv2.imread(image_path)
+
+    # Convert the image to HSV color space
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    # Create a mask for the object color range
+    mask = cv2.inRange(hsv, object_color_lower, object_color_upper)
+
+    # Find contours in the mask
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Calculate the total image area
+    total_area = img.shape[0] * img.shape[1]
+
+    object_percentages = []
+    #assuming at least one object
+    for contour in contours:
+        # Calculate the object area
+        object_area = cv2.contourArea(contour)
+
+        # Calculate the object percentage
+        object_percentage = (object_area / total_area) * 100
+        object_percentages.append(object_percentage)
+
+    return object_percentages
+
+ 

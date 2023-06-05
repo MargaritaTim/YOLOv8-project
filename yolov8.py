@@ -196,8 +196,9 @@ iou_dict["kangaroos"] = kangaroos_iou
 
 print(iou_dict)
 
-""" Image properties """
-for name in dataset_names:
+# """ Image properties """
+# for name in dataset_names:
+#     pass
 
 #df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
 
@@ -207,3 +208,7 @@ for name in dataset_names:
 #df_zebra
 #df_windows
 #df_kangaroos
+
+blur_measure = image_utils.contrast(windows_image_path)
+
+print("this is the blurrines measure:" + blur_measure)
