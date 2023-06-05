@@ -1,110 +1,66 @@
-
 ''' image properties functions '''
 
 # imports
+import cv2
+from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
 from PIL import Image, ImageStat
 
+import numpy as np
+
+# convert BGR to RGB
+def BGR2RGB(BGR_img):
+  # turning BGR pixel color to RGB
+  rgb_image = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2RGB)
+  return rgb_image
+
+# Convert the image to grayscale
+def convert_image_to_grayscale(image):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray_image
 
 
-# aspect ratio (width-height)
-def aspect_ratio(w,h):
-  aspect_ratio = float(w) / h
-  return aspect_ratio
+""" aspect ratio (width-height) """
+def return_aspect_ratio(w,h):
+  return float(w) / h
 
 """brightness"""
+# Calculate the mean brightness value
+def get_image_brightness(image):
+    im = convert_image_to_grayscale(image)
+    brightness = int(round(cv2.mean(im)[0]))
+    return brightness
 
-#source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
+# calculate with rms?
 
-
-
-def brightness(im_file):
-  # Convert image to greyscale, return average pixel brightness.
-  im = Image.open(im_file).convert('L')
-  stat = ImageStat.Stat(im)
-  return stat.mean[0]
-
-
-def brightness(im_file):
-  # Convert image to greyscale, return RMS pixel brightness.
-  im = Image.open(im_file).convert('L')
-  stat = ImageStat.Stat(im)
-  return stat.rms[0]
+""" perceived brightness """
 
 
-"""perceived brightness"""
 
-
-def brightness(im_file):
-  # Average pixels, then transform to "perceived brightness".
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  r, g, b = stat.mean
-  return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-
-
-def brightness(im_file):
-  # RMS of pixels, then transform to "perceived brightness".
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  r, g, b = stat.rms
-  return math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-
-
-def brightness(im_file):
-  # Calculate "perceived brightness" of pixels, then return average.
-  im = Image.open(im_file)
-  stat = ImageStat.Stat(im)
-  gs = (math.sqrt(0.241 * (r ** 2) + 0.691 * (g ** 2) + 0.068 * (b ** 2))
-        for r, g, b in im.getdata())
-  return sum(gs) / stat.count[0]
-
-
-"""contrast
-
-https://stackoverflow.com/questions/58821130/how-to-calculate-the-contrast-of-an-image
-"""
-
-
-def contrast(image_path):
+""" contrast """
+def contrast(image):
   # load image as YUV (or YCbCR) and select Y (intensity)
-  # or convert to grayscale, which should be the same.
-  # Alternately, use L (luminance) from LAB.
-  img = cv2.imread(image_path)
-  Y = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)[:, :, 0]
+  Y = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)[:, :, 0]
 
   # compute min and max of Y
   min = np.min(Y)
   max = np.max(Y)
-
   # compute contrast
   contrast = (max - min) / (max + min)
+
   return contrast
+
+
+def get_image_contrast(image):
+    # Calculate the standard deviation of pixel intensities
+    contrast = np.std(image)
+    return contrast
 
 
 """blur
 https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
 """
 
-# Commented out IPython magic to ensure Python compatibility.
-# open cv packege
-import cv2
-from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
 
-# useful packeges
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# statistic packeges
-from scipy.ndimage import variance
-from skimage import io
-from skimage.color import rgb2gray
-from skimage.filters import laplace
-from skimage.transform import resize
-
-
-# %matplotlib inline
 
 def variance_of_laplacian(img2):
   # compute the Laplacian of the image and then return the focus
@@ -113,10 +69,40 @@ def variance_of_laplacian(img2):
   return cv2.Laplacian(gray, cv2.CV_64F).var()
 
 
-def BGR2RGB(BGR_img):
-  # turning BGR pixel color to RGB
-  rgb_image = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2RGB)
-  return rgb_image
+
+""" BGR histograms """
+def bgr_histograms(image, name):
+
+    # Get BGR data from image
+    blue_channel = cv2.calcHist([img], [0], None, [256], [0, 256])
+    green_channel = cv2.calcHist([img], [1], None, [256], [0, 256])
+    red_channel = cv2.calcHist([img], [2], None, [256], [0, 256])
+
+    # Separate Histograms for each color
+    plt.subplot(3, 1, 1)
+    plt.title("Histogram of Blue Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(blue_channel, color="blue")
+
+    plt.subplot(3, 1, 2)
+    plt.title("Histogram of Green Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(green_channel, color="green")
+
+    plt.subplot(3, 1, 3)
+    plt.title("Histogram of Red Image")
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Pixel Frequency")
+    plt.plot(red_channel, color="red")
+
+    hist_name = 'rgb_histogram ' + name
+
+    plt.savefig(hist_name)
+
+
+
 
 
 def blurrinesDetection(directories, threshold):
@@ -184,3 +170,4 @@ def blurrinesDetection(directories, threshold):
 
       # return the results
       return ppi
+

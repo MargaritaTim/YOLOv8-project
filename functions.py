@@ -43,7 +43,7 @@ def return_bbox_masks_probs(res_lst):
     return boxes, masks, probs
 
 # create dataset with image data, predicted boxes and size
-def create_df(dataset_dir, image_type, yolo_model):
+def create_df(dataset_dir, image_type, yolo_model, color=None):
     pred_df = pd.DataFrame()
 
     # iterate over images
@@ -51,18 +51,23 @@ def create_df(dataset_dir, image_type, yolo_model):
         if (image.endswith(image_type)):
             # load and prepare image
             photo_filename = dataset_dir + "/" + image
+            # load image in GBR format
             im = cv2.imread(photo_filename)
             h, w, _ = im.shape
 
+            if color == "BW":
+                im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
             # make prediction for the image
-            results = yolo_model(photo_filename)
+            results = yolo_model(im)
 
             # save bbox, masks, probabilities
             boxes, masks, _ = return_bbox_masks_probs(results)
             list_of_boxes = boxes.xyxy.tolist()
 
             # append to dataframe
-            df = pd.DataFrame([{'name': image, 'height': h, 'width': w, 'boxes': list_of_boxes, }])
+            df = pd.DataFrame([{'name': image, 'image': im, 'height': h, 'width': w, 'boxes': list_of_boxes}])
+
             pred_df = pd.concat([pred_df, df], ignore_index=True)
     return pred_df
 
@@ -120,15 +125,13 @@ def create_annotations_df(annotations_dir):
 # convert absolute boxes measures to relative format
 def boxes_abs_to_relative(boxes, h, w):
     relative_boxes = []
-    for box in boxes:
-        # if box:
-        xmin = float(box[0]) / w
-        ymin = float(box[1]) / h
-        xmax = float(box[2]) / w
-        ymax = float(box[3]) / h
-        relative_boxes.append([xmin, ymin, xmax, ymax])
-        # else:
-        #  relative_boxes.append([])
+    if boxes:
+        for box in boxes:
+            xmin = float(box[0]) / w
+            ymin = float(box[1]) / h
+            xmax = float(box[2]) / w
+            ymax = float(box[3]) / h
+            relative_boxes.append([xmin, ymin, xmax, ymax])
     return relative_boxes
 
 # convert yolo boxes measures to relative format
@@ -194,8 +197,8 @@ def max_iou(list_of_iou):
 """ Pipeline function """
 
 # create dataframe with all the relevant data
-def pipeline(dataset_name, dataset_path, annotation_path, image_format, model, annotation_foramt=None):
-    df_images = create_df(dataset_path, image_format, model)
+def pipeline(dataset_name, dataset_path, annotation_path, image_format, model, annotation_foramt=None, color=None):
+    df_images = create_df(dataset_path, image_format, model, color)
 
     df_images['relative_boxes'] = df_images.apply(
         lambda row: boxes_abs_to_relative(row['boxes'], row['height'], row['width']), axis=1)
@@ -218,8 +221,7 @@ def pipeline(dataset_name, dataset_path, annotation_path, image_format, model, a
     if dataset_name == 'coco128':
         df_images['relative_annotations'] = df_images.apply(lambda row: yolo_to_relative(row['annotations']), axis=1)
     else:
-        df_images['relative_annotations'] = df_images.apply(
-            lambda row: boxes_abs_to_relative(row['annotations'], row['height'], row['width']), axis=1)
+        df_images['relative_annotations'] = df_images.apply(lambda row: boxes_abs_to_relative(row['annotations'], row['height'], row['width']), axis=1)
 
     df_images['iou_score'] = df_images.apply(
         lambda row: calculate_iou_list(row['relative_boxes'], row['relative_annotations']), axis=1)
