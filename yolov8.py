@@ -128,6 +128,7 @@ df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_
 
 iou_dict["windows"] = windows_iou
 
+
 # print low score images
 #df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 #windows_low_score_list = df_windows_low_score.index.values.tolist()
@@ -197,7 +198,31 @@ iou_dict["kangaroos"] = kangaroos_iou
 print(iou_dict)
 
 """ Image properties """
-for name in dataset_names:
+
+df_list = ['df_mouse','df_zebra','df_windows','df_kangaroos']
+
+for dataframe in df_list:
+    # aspect ratio
+    dataframe[['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)]
+    # brightness
+    dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+    # image contrast
+    dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
+
+print(df_mouse)
+"""   
+df_mouse['aspect_ratio'] = df_mouse.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+df_zebra['aspect_ratio'] = df_zebra.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+df_windows['aspect_ratio'] = df_windows.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+df_kangaroos['aspect_ratio'] = df_kangaroos.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+
+# brightness
+df_mouse['brightness'] = df_mouse.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+df_zebra['brightness'] = df_mouse.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+df_windows['brightness'] = df_mouse.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+df_kangaroos['brightness'] = df_mouse.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+"""
+
 
 #df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
 
