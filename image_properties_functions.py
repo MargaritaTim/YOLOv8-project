@@ -100,8 +100,11 @@ def bgr_histograms(image, name):
 
     plt.savefig(hist_name)
 
-
-
+""" more important value of the histogrm, think of ratio that represents well colour distribution. Correlation with IOU."""
+"""Check noise. baseline and than STD. edge detection, then remove and then look at variaace"""
+"""noise in complex background, split to areas and then look at variance. move sliding window. /additive white gaussian noise"""
+"""salt & pepper - Maragrita. How many burned pixels are in the image"""
+"""ratio object image - from original"""
 
 
 def blurrinesDetection(directories, threshold):
