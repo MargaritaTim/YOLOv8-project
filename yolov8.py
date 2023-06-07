@@ -1,6 +1,7 @@
 # ** Imports **
 import image_properties_functions as image_utils
 import functions as utils
+import save_df
 
 import os
 from os import listdir
@@ -29,13 +30,18 @@ from ultralytics import YOLO
 
 torch.manual_seed(0)
 
-''' YOLOv8 model '''
+''' Lists and dataframes '''
 
 # list with datasets names
 dataset_names = ["coco128", "mouse", "zebra", "windows", "kangaroos"]
 
+df_list = ['df_coco', 'df_mouse','df_zebra','df_windows','df_kangaroos']
+#iou_list = ['coco_iou', 'mouse_iou', 'zebra_iou']
+
 # create dictionary to save iou results for all datasets
 iou_dict = {}
+
+''' YOLOv8 model '''
 
 ''' 1 Create YOLOv8 model '''
 locale.getpreferredencoding = lambda: "UTF-8"
@@ -128,7 +134,6 @@ df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_
 
 iou_dict["windows"] = windows_iou
 
-
 # print low score images
 #df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 #windows_low_score_list = df_windows_low_score.index.values.tolist()
@@ -147,7 +152,7 @@ iou_dict["windows"] = windows_iou
 """ Predict Kangaroos Dataset """
 
 kangaroos_image_path = utils.repo_image_path('/Kangaroos')
-kangaroos_annos_dir = utils.repo_image_path('/Kangaroos/annots')
+kangaroos_annos_dir = utils.repo_image_path('Kangaroos/annotations')
 
 df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml', None)
 
@@ -195,22 +200,36 @@ iou_dict["kangaroos"] = kangaroos_iou
 
 #iou_dict["bw_zebra"] = bw_zebra_iou
 
-print(iou_dict)
+""" Save dataframes and IOU records """
 
 # save csv and load df (use script)
 # uncle .. for clean code
+FOLDER_NAME = 'dataframes'
+
+for dataframe, name in df_list, dataset_names:
+    save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
+
+save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
+
+
+# Convert dictionary to DataFrame
+df = pd.DataFrame.from_dict(dictionary, orient='index')
+
+# Save DataFrame as CSV file
+df.to_csv(file_name, header=False)
+
+print(iou_dict)
 
 """ Image properties """
 
-df_list = ['df_mouse','df_zebra','df_windows','df_kangaroos']
-
 for dataframe in df_list:
-    # aspect ratio
-    dataframe[['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)]
-    # brightness
-    dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
-    # image contrast
-    dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
+    if dataframe != 'df_coco':
+        # aspect ratio
+        dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+        # brightness
+        dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+        # image contrast
+        dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
     
 
 print(df_mouse)
