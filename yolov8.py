@@ -14,11 +14,10 @@ import locale
 
 import numpy as np
 import pandas as pd
+import itertools
 
 from matplotlib import pyplot
 import cv2
-from PIL import Image, ImageStat
-# from google.colab.patches import cv2_imshow
 
 import xml.etree.ElementTree as ET
 
@@ -35,7 +34,6 @@ torch.manual_seed(0)
 # list with datasets names
 dataset_names = ["coco128", "mouse", "zebra", "windows", "kangaroos"]
 
-df_list = ['df_coco', 'df_mouse','df_zebra','df_windows','df_kangaroos']
 #iou_list = ['coco_iou', 'mouse_iou', 'zebra_iou']
 
 # create dictionary to save iou results for all datasets
@@ -152,7 +150,7 @@ iou_dict["windows"] = windows_iou
 """ Predict Kangaroos Dataset """
 
 kangaroos_image_path = utils.repo_image_path('/Kangaroos')
-kangaroos_annos_dir = utils.repo_image_path('Kangaroos/annotations')
+kangaroos_annos_dir = utils.repo_image_path('/Kangaroos/annotations')
 
 df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml', None)
 
@@ -202,28 +200,30 @@ iou_dict["kangaroos"] = kangaroos_iou
 
 """ Save dataframes and IOU records """
 
-# save csv and load df (use script)
-# uncle .. for clean code
+# folder name to save dataframes
 FOLDER_NAME = 'dataframes'
 
-for dataframe, name in df_list, dataset_names:
+df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
+
+# save as CSV file
+for (dataframe, name) in zip(df_list, dataset_names):
     save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
 
-save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
-
+# save IOU dict to CSV
+save_df.save_dataframe_as_csv(iou_dict, FOLDER_NAME, "iou_scores")
 
 # Convert dictionary to DataFrame
-df = pd.DataFrame.from_dict(dictionary, orient='index')
+#df = pd.DataFrame.from_dict(dictionary, orient='index')
 
 # Save DataFrame as CSV file
-df.to_csv(file_name, header=False)
+#df.to_csv(file_name, header=False)
 
 print(iou_dict)
 
 """ Image properties """
 
 for dataframe in df_list:
-    if dataframe != 'df_coco':
+    if dataframe != df_coco:
         # aspect ratio
         dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
         # brightness
