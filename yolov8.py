@@ -210,21 +210,21 @@ for (dataframe, name) in zip(df_list, dataset_names):
     save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
 
 # save IOU dict to CSV
-save_df.save_dataframe_as_csv(iou_dict, FOLDER_NAME, "iou_scores")
 
 # Convert dictionary to DataFrame
-#df = pd.DataFrame.from_dict(dictionary, orient='index')
-
+iou_df = pd.DataFrame(iou_dict, index=[0])
 # Save DataFrame as CSV file
-#df.to_csv(file_name, header=False)
+save_df.save_dataframe_as_csv(iou_df, FOLDER_NAME, "iou_scores")
 
-print(iou_dict)
+""" Load dataframes """
 
+for (dataframe, name) in zip(df_list, dataset_names):
+    dataframe = pd.read_csv(utils.repo_image_path('/'+FOLDER_NAME+'/'+name+'.csv'))
 
 """ Image properties """
 
 for dataframe in df_list:
-    if dataframe != df_coco:
+    if dataframe != 'df_coco':
         # aspect ratio
         dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
         # brightness
@@ -233,8 +233,10 @@ for dataframe in df_list:
         dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
     
 
-print(df_mouse)
 
+
+
+""" characteristics for statistics- num_of_annotations, aspect_ratio, brightness, contrast, .... """
 
 #df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
 
@@ -245,6 +247,6 @@ print(df_mouse)
 #df_windows
 #df_kangaroos
 
-blur_measure = image_utils.contrast(windows_image_path)
+#blur_measure = image_utils.contrast(windows_image_path)
 
-print("this is the blurrines measure:" + blur_measure)
+#print("this is the blurrines measure:" + blur_measure)

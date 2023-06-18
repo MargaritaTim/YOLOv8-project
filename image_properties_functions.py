@@ -58,30 +58,6 @@ def get_image_contrast(image):
 #    return contrast
 
 
-"""blur
-https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
-"""
-
-#define bluriness using laplacian
-def is_blurry(image_path):
-  #read the image
-  image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-
-  #Compute Laplacian 
-  laplacian = cv2.Laplacian(image, cv2.CV_64F)
-
-  #calculate the variance of the laplaican 
-  var = np.var(laplacian)
-
-  return var
-
-def variance_of_laplacian(img2):
-  # compute the Laplacian of the image and then return the focus
-  # measure, which is simply the variance of the Laplacian
-  gray = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
-  return cv2.Laplacian(gray, cv2.CV_64F).var()
-
-
 """ BGR histograms """
 def bgr_histograms(image, name):
 
@@ -112,6 +88,32 @@ def bgr_histograms(image, name):
     hist_name = 'rgb_histogram ' + name
 
     plt.savefig(hist_name)
+
+
+
+
+"""blur
+https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
+"""
+
+#define bluriness using laplacian
+def is_blurry(image_path):
+  #read the image
+  image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+  #Compute Laplacian 
+  laplacian = cv2.Laplacian(image, cv2.CV_64F)
+
+  #calculate the variance of the laplaican 
+  var = np.var(laplacian)
+
+  return var
+
+def variance_of_laplacian(img2):
+  # compute the Laplacian of the image and then return the focus
+  # measure, which is simply the variance of the Laplacian
+  gray = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
+  return cv2.Laplacian(gray, cv2.CV_64F).var()
 
 
 
