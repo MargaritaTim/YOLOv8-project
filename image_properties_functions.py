@@ -24,6 +24,8 @@ def return_aspect_ratio(w,h):
   return float(w) / h
 
 """brightness"""
+#source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
+
 # Calculate the mean brightness value
 def get_image_brightness(image):
     im = convert_image_to_grayscale(image)
@@ -37,7 +39,7 @@ def get_image_brightness(image):
 
 
 """ contrast """
-def contrast(image):
+def get_image_contrast(image):
   # load image as YUV (or YCbCR) and select Y (intensity)
   Y = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)[:, :, 0]
 
@@ -50,10 +52,10 @@ def contrast(image):
   return contrast
 
 
-def get_image_contrast(image):
-    # Calculate the standard deviation of pixel intensities
-    contrast = np.std(image)
-    return contrast
+#def get_image_contrast(image):
+#    # Calculate the standard deviation of pixel intensities
+#    contrast = np.std(image)
+#    return contrast
 
 
 """blur
@@ -72,8 +74,6 @@ def is_blurry(image_path):
   var = np.var(laplacian)
 
   return var
-
-
 
 def variance_of_laplacian(img2):
   # compute the Laplacian of the image and then return the focus
@@ -112,6 +112,7 @@ def bgr_histograms(image, name):
     hist_name = 'rgb_histogram ' + name
 
     plt.savefig(hist_name)
+
 
 
 

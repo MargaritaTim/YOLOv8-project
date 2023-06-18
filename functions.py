@@ -25,6 +25,7 @@ def repo_image_path(path_from_repo_root):
     return relative_path
 
 # function to predict and plot image
+"""split to predict and print"""
 def predict_plot_image(image_path,model_trained):
   results = model_trained(image_path)
   res_plotted = results[0].plot()
