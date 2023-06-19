@@ -74,17 +74,17 @@ df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg
 
 iou_dict["coco128"] = coco_iou
 
-''' Predict Mouse Dataset '''
+# ''' Predict Mouse Dataset '''
 
-mouse_path = utils.repo_image_path('/Mouse')
-mouse_annos_dir = utils.repo_image_path('/Mouse/annotations')
+# mouse_path = utils.repo_image_path('/Mouse')
+# mouse_annos_dir = utils.repo_image_path('/Mouse/annotations')
 
-df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
+# df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
 
-iou_dict["mouse"] = mouse_iou
+# iou_dict["mouse"] = mouse_iou
 
-# images with low score
-df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
+# # images with low score
+# df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
 # print images with low score
 #mouse_low_score_lst = df_mouse_low_score.index.values.tolist()
@@ -99,14 +99,14 @@ df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['av
 #for image in mouse_high_score_list:
 #  utils.print_image_by_dataset_and_name(image, "Mouse",model_trained)
 
-""" Predict Zebras Dataset """
+# """ Predict Zebras Dataset """
 
-zebra_image_path = utils.repo_image_path('/Zebra')
-zebra_annos_dir = utils.repo_image_path('/Zebra/annotations')
+# zebra_image_path = utils.repo_image_path('/Zebra')
+# zebra_annos_dir = utils.repo_image_path('/Zebra/annotations')
 
-df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
+# df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
 
-iou_dict["zebra"] = zebra_iou
+# iou_dict["zebra"] = zebra_iou
 
 # print low score images
 #df_zebra_low_score = df_zebra[(df_zebra["avg_score"] < 0.5)].sort_values(by=['avg_score'])
@@ -122,15 +122,15 @@ iou_dict["zebra"] = zebra_iou
 #for image in zebra_low_score_list:
 #  utils.print_image_by_dataset_and_name(image, "Zebra",model_trained)
 
-""" Predict Windows Dataset """
+# """ Predict Windows Dataset """
 
-windows_image_path = utils.repo_image_path('/Street windows')
-windows_annos_dir = utils.repo_image_path('/Street windows/annotations')
+# windows_image_path = utils.repo_image_path('/Street windows')
+# windows_annos_dir = utils.repo_image_path('/Street windows/annotations')
 
-df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml', None)
-#print(windows_iou)
+# df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml', None)
+# #print(windows_iou)
 
-iou_dict["windows"] = windows_iou
+# iou_dict["windows"] = windows_iou
 
 # print low score images
 #df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(by=['avg_score'])
@@ -157,8 +157,8 @@ df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, 
 iou_dict["kangaroos"] = kangaroos_iou
 
 # print low score images
-#df_kangaroos_low_score = df_kangaroos[(df_kangaroos["avg_score"] < 0.5)].sort_values(by=['avg_score'])
-#kangaroos_low_score_list = df_kangaroos_low_score.index.values.tolist()
+df_kangaroos_low_score = df_kangaroos[(df_kangaroos["avg_score"] < 0.5)].sort_values(by=['avg_score'])
+kangaroos_low_score_list = df_kangaroos_low_score.index.values.tolist()
 
 #for image in kangaroos_low_score_list:
 #  utils.print_image_by_dataset_and_name(image, "Kangaroos",model_trained)
@@ -203,7 +203,8 @@ iou_dict["kangaroos"] = kangaroos_iou
 # folder name to save dataframes
 FOLDER_NAME = 'dataframes'
 
-df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
+#df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
+df_list = [df_coco, df_kangaroos]
 
 # save as CSV file
 for (dataframe, name) in zip(df_list, dataset_names):
@@ -223,14 +224,14 @@ for (dataframe, name) in zip(df_list, dataset_names):
 
 """ Image properties """
 
-for dataframe in df_list:
-    if dataframe != 'df_coco':
-        # aspect ratio
-        dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
-        # brightness
-        dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
-        # image contrast
-        dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
+# for dataframe in df_list:
+#     if dataframe != 'df_coco':
+#         # aspect ratio
+#         dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
+#         # brightness
+#         dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
+#         # image contrast
+#         dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
     
 
 
@@ -247,6 +248,12 @@ for dataframe in df_list:
 #df_windows
 #df_kangaroos
 
-#blur_measure = image_utils.contrast(windows_image_path)
+"""bluriness"""
+#find the average bluriness measure in a given dataset
+#find the average bluriness measure of images with a low iou score 
 
-#print("this is the blurrines measure:" + blur_measure)
+
+#M: is printing and not returning, why? also need to add this to the df
+average_df_blurriness = image_utils.blurriness_measure(kangaroos_image_path)
+#comapre if the average df blurriness is similiar to average low score df
+average_low_score_df = image_utils.blurriness_measure_df(df_kangaroos_low_score, "image")

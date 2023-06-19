@@ -1,6 +1,7 @@
 ''' image properties functions '''
 
 # imports
+import os
 import cv2
 from cv2 import IMREAD_COLOR, IMREAD_UNCHANGED
 from PIL import Image, ImageStat
@@ -101,21 +102,44 @@ def is_blurry(image_path):
   #read the image
   image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-  #Compute Laplacian 
-  laplacian = cv2.Laplacian(image, cv2.CV_64F)
+  #calculate blurriness
+  blurriness = cv2.Laplacian(image, cv2.CV_64F).var()
+  return blurriness
 
-  #calculate the variance of the laplaican 
-  var = np.var(laplacian)
+#M: needs refactoring
+# returns the average bluriness of a given dataset
+def blurriness_measure(image_folder):
+  image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
+  cnt = 0
+  total_blurriness = 0 
+  for image_file in image_files:
+    image_path = os.path.join(image_folder, image_file)
+    blur_measure = is_blurry(image_path)
+    total_blurriness +=blur_measure
+    cnt +=1 
+  average_blurriness = total_blurriness/cnt
+  print(average_blurriness)
 
-  return var
+#M: needs refactoring
+#returns the average bluriness of a given df
+def blurriness_measure_df(df, image_column):
+  cnt = 0
+  total_blurriness = 0 
+
+  for _, row in df.iterrows():
+    image = row[image_column]
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurriness = cv2.Laplacian(gray_image, cv2.CV_64F).var()
+    total_blurriness += blurriness
+    cnt +=1 
+  average_blurriness = total_blurriness/cnt
+  print(average_blurriness)
 
 def variance_of_laplacian(img2):
   # compute the Laplacian of the image and then return the focus
   # measure, which is simply the variance of the Laplacian
   gray = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
   return cv2.Laplacian(gray, cv2.CV_64F).var()
-
-
 
 
 def blurrinesDetection(directories, threshold):
