@@ -1,4 +1,4 @@
-# ** Imports **
+""" Imports """
 import image_properties_functions as image_utils
 import functions as utils
 import save_df
@@ -27,6 +27,8 @@ import torchvision.models as models
 import ultralytics
 from ultralytics import YOLO
 
+# !pip install pyyaml h5py
+
 torch.manual_seed(0)
 
 ''' Lists and dataframes '''
@@ -39,12 +41,17 @@ dataset_names = ["coco128", "mouse", "zebra", "windows", "kangaroos"]
 # create dictionary to save iou results for all datasets
 iou_dict = {}
 
-''' YOLOv8 model '''
+PREDICTION_FLAG = 'No'
 
-''' 1 Create YOLOv8 model '''
-locale.getpreferredencoding = lambda: "UTF-8"
+"ADD FLAG"
 
-# !pip install pyyaml h5py
+if PREDICTION_FLAG=='Yes':
+
+    ''' YOLOv8 model '''
+
+    ''' 1 Create YOLOv8 model '''
+    locale.getpreferredencoding = lambda: "UTF-8"
+
 
 # Load a model
 # model = YOLO('yolov8n.yaml')  # build a new model from YAML
@@ -59,7 +66,7 @@ locale.getpreferredencoding = lambda: "UTF-8"
 # model.export()  
 
 ''' 3 Load trained model & example '''
-model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
+#model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 
 # ** Example**
 #image_path = utils.repo_image_path('/Kangaroos/00050.jpg')
@@ -70,21 +77,21 @@ model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
 coco128_path = utils.repo_image_path('/coco128/image')
 coco_annos_dir = utils.repo_image_path('/coco128/annotations')
 
-df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
+#df_coco, coco_iou = utils.pipeline('coco128', coco128_path, coco_annos_dir, 'jpg', model_trained)
 
-iou_dict["coco128"] = coco_iou
+#iou_dict["coco128"] = coco_iou
 
 ''' Predict Mouse Dataset '''
 
 mouse_path = utils.repo_image_path('/Mouse')
 mouse_annos_dir = utils.repo_image_path('/Mouse/annotations')
 
-df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
+#df_mouse, mouse_iou = utils.pipeline('mouse', mouse_path, mouse_annos_dir, 'jpg', model_trained)
 
-iou_dict["mouse"] = mouse_iou
+#iou_dict["mouse"] = mouse_iou
 
 # images with low score
-df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
+#df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['avg_score'])
 
 # print images with low score
 #mouse_low_score_lst = df_mouse_low_score.index.values.tolist()
@@ -104,9 +111,9 @@ df_mouse_low_score = df_mouse[(df_mouse["avg_score"] < 0.5)].sort_values(by=['av
 zebra_image_path = utils.repo_image_path('/Zebra')
 zebra_annos_dir = utils.repo_image_path('/Zebra/annotations')
 
-df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
+#df_zebra, zebra_iou = utils.pipeline('zebra', zebra_image_path, zebra_annos_dir, 'jpg', model_trained)
 
-iou_dict["zebra"] = zebra_iou
+#iou_dict["zebra"] = zebra_iou
 
 # print low score images
 #df_zebra_low_score = df_zebra[(df_zebra["avg_score"] < 0.5)].sort_values(by=['avg_score'])
@@ -127,10 +134,10 @@ iou_dict["zebra"] = zebra_iou
 windows_image_path = utils.repo_image_path('/Street windows')
 windows_annos_dir = utils.repo_image_path('/Street windows/annotations')
 
-df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml', None)
+#df_windows, windows_iou = utils.pipeline('windows', windows_image_path, windows_annos_dir, 'jpg', model_trained, '.xml', None)
 #print(windows_iou)
 
-iou_dict["windows"] = windows_iou
+#iou_dict["windows"] = windows_iou
 
 # print low score images
 #df_windows_low_score = df_windows[(df_windows["avg_score"] < 0.5)].sort_values(by=['avg_score'])
@@ -152,9 +159,9 @@ iou_dict["windows"] = windows_iou
 kangaroos_image_path = utils.repo_image_path('/Kangaroos')
 kangaroos_annos_dir = utils.repo_image_path('/Kangaroos/annotations')
 
-df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml', None)
+#df_kangaroos, kangaroos_iou = utils.pipeline('kangaroos', kangaroos_image_path, kangaroos_annos_dir,'jpg', model_trained, '.xml', None)
 
-iou_dict["kangaroos"] = kangaroos_iou
+#iou_dict["kangaroos"] = kangaroos_iou
 
 # print low score images
 #df_kangaroos_low_score = df_kangaroos[(df_kangaroos["avg_score"] < 0.5)].sort_values(by=['avg_score'])
@@ -203,50 +210,71 @@ iou_dict["kangaroos"] = kangaroos_iou
 # folder name to save dataframes
 FOLDER_NAME = 'dataframes'
 
-df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
+#df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
 
 # save as CSV file
-for (dataframe, name) in zip(df_list, dataset_names):
-    save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
+#for (dataframe, name) in zip(df_list, dataset_names):
+#    save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
 
 # save IOU dict to CSV
 
 # Convert dictionary to DataFrame
-iou_df = pd.DataFrame(iou_dict, index=[0])
+#iou_df = pd.DataFrame(iou_dict, index=[0])
 # Save DataFrame as CSV file
-save_df.save_dataframe_as_csv(iou_df, FOLDER_NAME, "iou_scores")
+#save_df.save_dataframe_as_csv(iou_df, FOLDER_NAME, "iou_scores")
 
 """ Load dataframes """
+import ast
 
-for (dataframe, name) in zip(df_list, dataset_names):
-    dataframe = pd.read_csv(utils.repo_image_path('/'+FOLDER_NAME+'/'+name+'.csv'))
+# Define a function to convert the string representation to a NumPy array
+def convert_image_string(image_string):
+    # Extract the individual matrix strings
+    matrix_strings = re.findall(r'\[\[.*?\]\]', image_string)
+    matrices = []
+    for matrix_str in matrix_strings:
+        # Extract the numerical values from the matrix string using regular expressions
+        values = re.findall(r'\d+', matrix_str)
+        # Convert the values to integers
+        values = list(map(int, values))
+        # Reshape the values into a 3D array
+        matrix_array = np.array(values).reshape((-1, 3))
+        matrices.append(matrix_array)
+    return matrices
+
+csv_list = ['kangaroos', 'mouse', 'windows', 'zebra', 'iou_scores']
+df_dict = {}
+
+for csv_file in csv_list:
+    df = pd.read_csv(utils.repo_image_path('/' + FOLDER_NAME + '/' + csv_file + '.csv')).to_numpy()
+    # Apply the conversion function to the 'image' column
+    df['image'] = df['image'].apply(convert_image_string)
+    print(df)
+    df_dict[csv_file] = df
+    #df_dict[csv_file]['image'] = df_dict[csv_file]['image'].apply(lambda x: np.array(ast.literal_eval(x)))
+    #df_dict[csv_file][['image', 'boxes', 'annotations', 'relative_annotations']] = csv_file['image', 'boxes', 'annotations', 'relative_annotations'].values
+#    df_dict[csv_file]['image'] = df_dict['image'].values
+    #df_dict[csv_file]['boxes'].to_numpy()
+    #df_dict[csv_file]['annotations'].to_numpy()
+    #df_dict[csv_file]['relative_annotations'].to_numpy()
+
+
+
+
+#print(df_dict['mouse'])
 
 """ Image properties """
 
-for dataframe in df_list:
-    if dataframe != 'df_coco':
+'''for key, dataframe in df_dict.items():
+    if key != 'iou_scores':
         # aspect ratio
         dataframe['aspect_ratio'] = dataframe.apply(lambda row: image_utils.return_aspect_ratio(row['height'], row['width']), axis=1)
         # brightness
         dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
         # image contrast
         dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
-    
+'''
 
 
 
 
 """ characteristics for statistics- num_of_annotations, aspect_ratio, brightness, contrast, .... """
-
-#df_images['avg_score'] = df_images.apply(lambda row: sum(row['max_iou_score']) / row['num_of_annotations'], axis=1)
-
-#return_aspect_ratio(w,h)
-#df_images['relative_boxes'] = df_images.apply(lambda row: boxes_abs_to_relative(row['boxes'], row['height'], row['width']), axis=1)
-# df_mouse
-#df_zebra
-#df_windows
-#df_kangaroos
-
-#blur_measure = image_utils.contrast(windows_image_path)
-
-#print("this is the blurrines measure:" + blur_measure)

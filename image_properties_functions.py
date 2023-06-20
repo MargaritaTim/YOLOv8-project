@@ -18,10 +18,9 @@ def convert_image_to_grayscale(image):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray_image
 
-
 """ aspect ratio (width-height) """
 def return_aspect_ratio(w,h):
-  return float(w) / h
+    return float(w) / h
 
 """brightness"""
 #source: https://stackoverflow.com/questions/3490727/what-are-some-methods-to-analyze-image-brightness-using-python
