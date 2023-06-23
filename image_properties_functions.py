@@ -108,33 +108,34 @@ def is_blurry(image_path):
 
 #M: needs refactoring
 # returns the average bluriness of a given dataset
-def blurriness_measure(image_folder):
-  image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
-  cnt = 0
-  total_blurriness = 0 
-  for image_file in image_files:
-    image_path = os.path.join(image_folder, image_file)
-    blur_measure = is_blurry(image_path)
-    total_blurriness +=blur_measure
-    cnt +=1 
-  average_blurriness = total_blurriness/cnt
-  print(average_blurriness)
+# def blurriness_measure(image_folder):
+#   image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
+#   cnt = 0
+#   total_blurriness = 0 
+#   for image_file in image_files:
+#     image_path = os.path.join(image_folder, image_file)
+#     blur_measure = is_blurry(image_path)
+#     total_blurriness +=blur_measure
+#     cnt +=1 
+#   average_blurriness = total_blurriness/cnt
+#   print(average_blurriness)
 
 #M: needs refactoring
 #returns the average bluriness of a given df
-def blurriness_measure_df(df, image_column):
-  cnt = 0
-  total_blurriness = 0 
+# def blurriness_measure_df(df, image_column):
+#   cnt = 0
+#   total_blurriness = 0 
 
-  for _, row in df.iterrows():
-    image = row[image_column]
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurriness = cv2.Laplacian(gray_image, cv2.CV_64F).var()
-    total_blurriness += blurriness
-    cnt +=1 
-  average_blurriness = total_blurriness/cnt
-  print(average_blurriness)
+#   for _, row in df.iterrows():
+#     image = row[image_column]
+#     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     blurriness = cv2.Laplacian(gray_image, cv2.CV_64F).var()
+#     total_blurriness += blurriness
+#     cnt +=1 
+#   average_blurriness = total_blurriness/cnt
+#   print(average_blurriness)
 
+#is this being used? there's already a function like this
 def variance_of_laplacian(img2):
   # compute the Laplacian of the image and then return the focus
   # measure, which is simply the variance of the Laplacian
@@ -209,7 +210,7 @@ def blurrinesDetection(directories, threshold):
       return ppi
 
 """ object precentage from image """
-#considering there is at least one object per image
+#considering there is at least one object per image <- need to change for 0 images case
 
 def object_percentage(image_path, object_color_lower, object_color_upper):
 
@@ -240,4 +241,52 @@ def object_percentage(image_path, object_color_lower, object_color_upper):
 
     return object_percentages
 
+
+""" noise level in images """
+#using Median Absolute Deviation (MAD) estimator
  
+def estimate_noise(image):
+    # Convert the image to grayscale if it's not already
+    if len(image.shape) == 3:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray_image = image
+ 
+    # Apply a 3x3 median filter to the grayscale image
+    # median filtetring helps to supress noise 
+    median_image = cv2.medianBlur(gray_image, 3)
+ 
+    # Compute the absolute difference between the original and median-filtered images
+    abs_diff = np.abs(gray_image.astype(np.float32) - median_image.astype(np.float32))
+ 
+    # Calculate the median absolute deviation (MAD)
+    # robus against outliers 
+    mad = np.median(abs_diff)
+ 
+    # Estimate the noise standard deviation using a scaling factor
+    noise_std_dev = mad / 0.6745
+ 
+    return noise_std_dev
+
+#salt and pepper
+def is_salt_and_pepper_noise(image, threshold=0.05):
+    # Convert the image to grayscale if it's not already
+    if len(image.shape) == 3:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray_image = image
+ 
+    # Apply a 3x3 median filter to the grayscale image
+    median_image = cv2.medianBlur(gray_image, 3)
+ 
+    # Compute the absolute difference between the original and median-filtered images
+    abs_diff = np.abs(gray_image.astype(np.float32) - median_image.astype(np.float32))
+ 
+    # Count the number of pixels with a large difference (potentially salt-and-pepper noise)
+    large_diff_count = np.sum(abs_diff > 30)
+ 
+    # Calculate the ratio of pixels with a large difference to the total number of pixels
+    large_diff_ratio = large_diff_count / (gray_image.shape[0] * gray_image.shape[1])
+ 
+    # If the ratio exceeds the threshold, consider the image to have salt-and-pepper noise
+    return large_diff_ratio > threshold

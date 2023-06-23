@@ -249,11 +249,40 @@ for (dataframe, name) in zip(df_list, dataset_names):
 #df_kangaroos
 
 """bluriness"""
+#shouldn't this be a function?...
 #find the average bluriness measure in a given dataset
-#find the average bluriness measure of images with a low iou score 
+image_files = [f for f in os.listdir(kangaroos_image_path) if f.endswith('.jpg')]
+cnt = 0
+total_blurriness = 0 
+for image_file in image_files:
+    image_path = os.path.join(kangaroos_image_path, image_file)
+    blur_measure = image_utils.is_blurry(image_path)
+    total_blurriness +=blur_measure
+    cnt +=1 
+    average_blurriness = total_blurriness/cnt
+print(average_blurriness)
+#this will save to the datframe lines 227
+
+#average of iou under 0.5
+cnt = 0
+total_blurriness = 0 
+for _, row in df_kangaroos_low_score.iterrows():
+    image = row["image"]
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurriness = cv2.Laplacian(gray_image, cv2.CV_64F).var()
+    total_blurriness += blurriness
+    cnt +=1 
+    average_blurriness = total_blurriness/cnt
+print(average_blurriness)
 
 
-#M: is printing and not returning, why? also need to add this to the df
-average_df_blurriness = image_utils.blurriness_measure(kangaroos_image_path)
-#comapre if the average df blurriness is similiar to average low score df
-average_low_score_df = image_utils.blurriness_measure_df(df_kangaroos_low_score, "image")
+image_files = [f for f in os.listdir(kangaroos_image_path) if f.endswith('.jpg')]
+for image_file in image_files:
+    
+    image_path = cv2.imread(os.path.join(kangaroos_image_path, image_file))
+    noise_std_dev = image_utils.estimate_noise(image)
+    #need to add to df
+    # print("Estimated noise standard deviation:", noise_std_dev)
+
+
+
