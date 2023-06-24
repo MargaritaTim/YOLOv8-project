@@ -39,16 +39,20 @@ def get_image_brightness(image):
 
 """ contrast """
 def get_image_contrast(image):
-  # load image as YUV (or YCbCR) and select Y (intensity)
-  Y = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)[:, :, 0]
+    # load image as YUV (or YCbCR) and select Y (intensity)
+    y = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)[:, :, 0]
 
-  # compute min and max of Y
-  min = np.min(Y)
-  max = np.max(Y)
-  # compute contrast
-  contrast = (max - min) / (max + min)
+    # compute min and max of Y
+    min_y = np.min(y)
+    max_y = np.max(y)
 
-  return contrast
+    # convert to float
+    min_y = min_y.astype(np.float64)
+    max_y = max_y.astype(np.float64)
+
+    # compute contrast
+    contrast = (max_y - min_y) / (max_y + min_y)
+    return contrast
 
 
 #def get_image_contrast(image):
@@ -96,9 +100,9 @@ https://www.kaggle.com/code/eladhaziza/perform-blur-detection-with-opencv
 """
 
 #define bluriness using laplacian
-def is_blurry(image_path):
+def is_blurry(image):
   #read the image
-  image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+  image = image
 
   #Compute Laplacian 
   laplacian = cv2.Laplacian(image, cv2.CV_64F)
