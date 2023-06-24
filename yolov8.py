@@ -1,7 +1,9 @@
 """ Imports """
 import image_properties_functions as image_utils
+import visualization_utils as visual_utils
 import functions as utils
 import save_df
+import pickle
 
 import os
 from os import listdir
@@ -43,13 +45,13 @@ iou_dict = {}
 FOLDER_NAME = 'dataframes'
 
 # Flags
-MODEL_FLAG = 'No'
-PREDICTION_FLAG = 'No'
-SAVE_FLAG = 'No'
+MODEL_FLAG = 0
+PREDICTION_FLAG = 0
+SAVE_FLAG = 0
 
 " Predict images and create dataframe if PREDICTION_FLAG is Yes"
 
-if MODEL_FLAG == 'Yes':
+if MODEL_FLAG:
 
     ''' YOLOv8 model '''
 
@@ -68,7 +70,7 @@ if MODEL_FLAG == 'Yes':
     # export the model
     model.export()
 
-if PREDICTION_FLAG == 'Yes':
+if PREDICTION_FLAG:
 
     ''' 3 Load trained model & example '''
     model_trained = YOLO(utils.repo_image_path('/best.torchscript'), task='detect')
@@ -203,71 +205,31 @@ if PREDICTION_FLAG == 'Yes':
 
 """ Save dataframes and IOU records if SAVE_FLAG is Yes"""
 
-if SAVE_FLAG == 'Yes':
+if SAVE_FLAG:
 
     df_list = [df_coco, df_mouse, df_zebra, df_windows, df_kangaroos]
 
-    # save as CSV file
-    for (dataframe, name) in zip(df_list, dataset_names):
-        save_df.save_dataframe_as_csv(dataframe, FOLDER_NAME, name)
+    # save as PKL file
+    for (dataframe,name) in zip(df_list,dataset_names):
+        dataframe.to_pickle(utils.repo_image_path('/' + FOLDER_NAME + '/' + name + '.pkl'))
 
     # save IOU dict to CSV
-
     # Convert dictionary to DataFrame
     iou_df = pd.DataFrame(iou_dict, index=[0])
     # Save DataFrame as CSV file
-    save_df.save_dataframe_as_csv(iou_df, FOLDER_NAME, "iou_scores")
+    iou_df.to_pickle(utils.repo_image_path('/' + FOLDER_NAME + '/' + "iou_scores" + '.pkl'))
 
 """ Load dataframes """
 
 csv_list = ['kangaroos', 'mouse', 'windows', 'zebra', 'iou_scores']
-
 df_dict = {}
 
 for csv_file in csv_list:
-    df = pd.read_csv(utils.repo_image_path('/' + FOLDER_NAME + '/' + csv_file + '.csv')).replace('"','', regex=True)
+    df = pd.read_pickle(utils.repo_image_path('/' + FOLDER_NAME + '/' + csv_file + '.pkl'))
     df_dict[csv_file] = df
-
-"""
-import ast
-
-# Define a function to convert the string representation to a NumPy array
-def convert_image_string(image_string):
-    # Extract the individual matrix strings
-    matrix_strings = re.findall(r'\[\[.*?\]\]', image_string)
-    matrices = []
-    for matrix_str in matrix_strings:
-        # Extract the numerical values from the matrix string using regular expressions
-        values = re.findall(r'\d+', matrix_str)
-        # Convert the values to integers
-        values = list(map(int, values))
-        # Reshape the values into a 3D array
-        matrix_array = np.array(values).reshape((-1, 3))
-        matrices.append(matrix_array)
-    return matrices
-
-csv_list = ['kangaroos', 'mouse', 'windows', 'zebra', 'iou_scores']
-df_dict = {}
-
-for csv_file in csv_list:
-    df = pd.read_csv(utils.repo_image_path('/' + FOLDER_NAME + '/' + csv_file + '.csv')).to_numpy()
-    # Apply the conversion function to the 'image' column
-    df['image'] = df['image'].apply(convert_image_string)
-    print(df)
-    df_dict[csv_file] = df
-    #df_dict[csv_file]['image'] = df_dict[csv_file]['image'].apply(lambda x: np.array(ast.literal_eval(x)))
-    #df_dict[csv_file][['image', 'boxes', 'annotations', 'relative_annotations']] = csv_file['image', 'boxes', 'annotations', 'relative_annotations'].values
-#    df_dict[csv_file]['image'] = df_dict['image'].values
-    #df_dict[csv_file]['boxes'].to_numpy()
-    #df_dict[csv_file]['annotations'].to_numpy()
-    #df_dict[csv_file]['relative_annotations'].to_numpy()
-
-
-#print(df_dict['mouse'])
-"""
 
 """ Image properties """
-"""
+
 for key, dataframe in df_dict.items():
     if key != 'iou_scores':
         # aspect ratio
@@ -276,8 +238,12 @@ for key, dataframe in df_dict.items():
         dataframe['brightness'] = dataframe.apply(lambda row: image_utils.get_image_brightness(row['image']), axis=1)
         # image contrast
         dataframe['contrast'] = dataframe.apply(lambda row: image_utils.get_image_contrast(row['image']), axis=1)
-"""
+        # image blurriness
+        dataframe['is_blurry'] = dataframe.apply(lambda row: image_utils.is_blurry(row['image']), axis=1)
 
-print(df_dict)
+
+visual_utils.histogram(df_dict['kangaroos'],'aspect_ratio')
+visual_utils.correlation(df_dict['kangaroos'],'avg_score','aspect_ratio')
+
 
 """ characteristics for statistics- num_of_annotations, aspect_ratio, brightness, contrast, .... """
